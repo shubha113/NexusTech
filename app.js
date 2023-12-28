@@ -7,13 +7,8 @@ import cors from "cors";
 config({path:"./config/config.env"});
 const app = express();
 // Example middleware to enable CORS
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  next();
-});
+
+app.use(cors({origin: "http://localhost:3000", credentials: true, methods:["GET", "POST","PUT","DELETE"],}));
 
 //using middlewares
 app.use(express.json());
