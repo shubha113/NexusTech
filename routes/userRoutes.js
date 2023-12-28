@@ -11,7 +11,7 @@ router.route('/register').post(singleUpload, register)
 //login
 router.route('/login').post(login);
 //logout
-router.route('/logout').post(logout);
+router.route('/logout').get(logout);
 //get my profile
 router.route('/me').get(isAuthenticated, getMyProfile);
 //delete my profile
