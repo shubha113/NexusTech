@@ -48,16 +48,24 @@ export const getRazorpayKey = catchAsyncError(async(req, res, next)=>{
 });
 export const cancelSubscription = catchAsyncError(async(req, res, next)=>{
     const user = await User.findById(req.user._id);
+    console.log("User Document:", user);
     const subscriptionId = user.subscription.id;
+    if (!subscriptionId) {
+        return next(new ErrorHandler("User does not have an active subscription", 400));
+      }
     let refund = false;
     await instance.subscriptions.cancel(subscriptionId);
     const payment = await Payment.findOne({razorpay_subscription_id: subscriptionId});
+    console.log("Payment Document:", payment);
+
     const gap = Date.now()- payment.createdAt;
     const refundTime = process.env.REFUND_DAYS * 24 * 60 * 60 * 1000;
     if(refundTime > gap){
        await instance.payments.refund(payment.razorpay_payment_id);
        refund = true;
     }
+    console.log("Refund Status:", refund);
+
     await payment.deleteOne();
     user.subscription.id= undefined;
     user.subscription.status = undefined;
