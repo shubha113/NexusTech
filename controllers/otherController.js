@@ -70,7 +70,9 @@ export const getDashboardStats = catchAsyncError(async(req, res, next)=>{
         if(viewsPercentage < 0) viewsProfit = false;
         if(subscriptionsPercentage < 0) subscriptionsProfit = false;
     }
-    
+    usersPercentage = usersPercentage.toFixed(2);
+    viewsPercentage = viewsPercentage.toFixed(2);
+    subscriptionsPercentage = subscriptionsPercentage.toFixed(2);
     res.status(200).json({
         success:true,
         stats: statsData,
