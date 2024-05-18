@@ -8,7 +8,7 @@ const app = express();
 // Example middleware to enable CORS
 app.use(
   cors({
-    origin: 'http://localhost:5000/',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
