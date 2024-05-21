@@ -9,7 +9,7 @@ const router = express.Router();
 //to register a new user
 router.route('/register').post(singleUpload, register)
 //login
-router.route('/login').get(login);
+router.route('/login').post(login);
 //logout
 router.route('/logout').get(logout);
 //get my profile

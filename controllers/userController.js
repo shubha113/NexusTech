@@ -22,16 +22,22 @@ export const register = catchAsyncError(async(req, res, next)=>{
     sendToken(res, user, "Register Successfully", 201);
 });
 
-export const login = catchAsyncError(async(req, res, next)=>{
-    const {email, password} = req.body;
-    
-    if(!email || !password) 
-    return next(new ErrorHandler("Please enter all fields", 400));
-    const user = await User.findOne({email}).select("+password");
-    if(!user) return next (new ErrorHandler("Incorrect Email or password", 401));
-    const isMatch = await user.comparePassword(password);
-    if(!isMatch) return next(new ErrorHandler("Incorrect Email or password", 401));
-    sendToken(res, user, `Welcome back ${user.name}`, 200);
+export const login = catchAsyncError(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    return next(new ErrorHandler("Please enter all field", 400));
+
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user) return next(new ErrorHandler("Incorrect Email or Password", 401));
+
+  const isMatch = await user.comparePassword(password);
+
+  if (!isMatch)
+    return next(new ErrorHandler("Incorrect Email or Password", 401));
+
+  sendToken(res, user, `Welcome back, ${user.name}`, 200);
 });
 
 export const logout = catchAsyncError(async (req, res, next) => {
@@ -183,7 +189,6 @@ export const deleteUser = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.params.id);
   if (!user) return next(new ErrorHandler("User not found", 404));
   await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-  console.log(user);
   // Cancel Subscription
   await user.deleteOne();
   res.status(200).json({

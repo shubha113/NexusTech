@@ -25,6 +25,7 @@ export const getAllCourses = catchAsyncError(async (req, res, next) => {
   });
 });
 
+
 export const createCourse = catchAsyncError(async (req, res, next) => {
   const { title, description, category, createdBy } = req.body;
 
@@ -120,7 +121,7 @@ export const deleteCourse = catchAsyncError(async (req, res, next) => {
     });
   }
 
-  await course.remove();
+  await course.deleteOne();
 
   res.status(200).json({
     success: true,

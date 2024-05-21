@@ -40,12 +40,14 @@ export const paymentVarification = catchAsyncError(async(req, res, next)=>{
     await user.save();
     res.redirect(`${process.env.FRONTEND_URL}/paymentsuccess?reference=${razorpay_payment_id}`);
 });
+
 export const getRazorpayKey = catchAsyncError(async(req, res, next)=>{
     res.status(200).json({
         success:true,
         key:process.env.RAZORPAY_API_KEY,
     });
 });
+
 export const cancelSubscription = catchAsyncError(async(req, res, next)=>{
     const user = await User.findById(req.user._id);
     const subscriptionId = user.subscription.id;
