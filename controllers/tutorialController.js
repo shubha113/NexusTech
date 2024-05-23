@@ -21,38 +21,47 @@ export const createTutorial = catchAsyncError(async (req, res, next) => {
   });
 
 
-export const deleteTutorial = catchAsyncError(async (req, res, next) => {
-    const { tutorialId } = req.query;
+  export const deleteTutorial = catchAsyncError(async (req, res, next) => {
+    const { id } = req.params; 
   
-    const tutorial = await Tutorial.findById(tutorialId);
-    if (!tutorial) return next(new ErrorHandler("Tutorial not found", 404));
+    const tutorial = await Tutorial.findById(id);
   
-    await Tutorial.findByIdAndDelete(tutorialId);
+    if (!tutorial) {
+      return next(new ErrorHandler("Tutorial not found", 404));
+    }
+  
+    await Tutorial.findByIdAndDelete(id);
   
     res.status(200).json({
       success: true,
       message: "Tutorial Deleted Successfully",
     });
-});
-
-export const getTutorial = catchAsyncError(async (req, res, next) => {
-  const tutorial = await Tutorial.find();
-
-  if (!tutorial) return next(new ErrorHandler("Tutorial not found", 404));
-
-  res.status(200).json({
-    success: true,
-    tutorial
   });
-});
+  
 
-export const getSingleTutorial = catchAsyncError(async (req, res, next) => {
-  const tutorial = await Tutorial.findById(req.params.id);
-
-  if (!tutorial) return next(new ErrorHandler("Tutorial not found", 404));
-
-  res.status(200).json({
-    success: true,
-    tutorial
+  export const getTutorial = catchAsyncError(async (req, res, next) => {
+    const tutorials = await Tutorial.find();
+  
+    if (!tutorials || tutorials.length === 0) {
+      return next(new ErrorHandler("No tutorials found", 404));
+    }
+  
+    res.status(200).json({
+      success: true,
+      tutorials,
+    });
   });
-});
+  
+  // Get single tutorial by ID
+  export const getSingleTutorial = catchAsyncError(async (req, res, next) => {
+    const tutorial = await Tutorial.findById(req.params.id);
+  
+    if (!tutorial) {
+      return next(new ErrorHandler("Tutorial not found", 404));
+    }
+  
+    res.status(200).json({
+      success: true,
+      tutorial,
+    });
+  });

@@ -9,7 +9,7 @@ const schema = new mongoose.Schema({
     },
      
     content:{
-        type:String,
+        type:mongoose.Schema.Types.Mixed,
         required:[true, 'Please enter course content'],
         minLength:[20, "Content must be of atleast 20 characters"]
     },

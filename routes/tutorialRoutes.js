@@ -6,7 +6,7 @@ const router = express.Router();
 //create new tutorial -- admin
 router.route('/createtutorial').post(isAuthenticated, authorizeAdmin, createTutorial);
 //delete tutorial -- admin
-router.route('/deletetutorial').delete(isAuthenticated, authorizeAdmin, deleteTutorial);
+router.route('/deletetutorial/:id').delete(isAuthenticated, authorizeAdmin, deleteTutorial);
 //get tutorial -- admin 
 router.route('/tutorial').get(getTutorial);
 // Route to get a single tutorial by ID
