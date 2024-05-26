@@ -49,6 +49,12 @@ const schema = new mongoose.Schema({
             },
             poster:String,
         },
+    ], 
+    purchasedCourses: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Course',
+        }
     ],
     createdAt:{
         type:Date,
