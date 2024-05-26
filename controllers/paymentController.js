@@ -25,7 +25,10 @@ export const buySubscription = catchAsyncError(async(req, res, next)=>{
 });
 
 export const paymentVarification = catchAsyncError(async(req, res, next)=>{
-    const {razorpay_signature, razorpay_payment_id, razorpay_subscription_id} = req.body;
+    const {razorpay_signature, razorpay_payment_id, razorpay_subscription_id, courseId} = req.body;
+    if (!courseId) {
+        return next(new ErrorHandler('Course ID is required', 400));
+    }
     const user = await User.findById(req.user._id);
     const subscription_id = user.subscription.id;
     const generated_signature = crypto
@@ -35,8 +38,12 @@ export const paymentVarification = catchAsyncError(async(req, res, next)=>{
     const isAuthentic = generated_signature === razorpay_signature;
     if(!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/paymentfail`);
     //database comes here
-    await Payment.create({razorpay_payment_id, razorpay_signature, razorpay_subscription_id});
+    await Payment.create({razorpay_payment_id, razorpay_signature, razorpay_subscription_id, courseId});
     user.subscription.status= "active";
+    // Add purchased course to the user's profile
+    if (!user.purchasedCourses.includes(courseId)) {
+        user.purchasedCourses.push(courseId);
+    }
     await user.save();
     res.redirect(`${process.env.FRONTEND_URL}/paymentsuccess?reference=${razorpay_payment_id}`);
 });
