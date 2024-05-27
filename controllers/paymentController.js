@@ -5,40 +5,24 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
-export const buySubscription = catchAsyncError(async (req, res, next) => {
-    const { courseId } = req.body;
+export const buySubscription = catchAsyncError(async(req, res, next)=>{
     const user = await User.findById(req.user._id);
-
-    if (user.role === "admin")
-      return next(new ErrorHandler("Admin can't buy subscription", 400));
-
-    if (!courseId) {
-      return next(new ErrorHandler("Course ID is required", 400));
-    }
-
-    const plan_id = process.env.PLAN_ID || "plan_NFmb0KYfgoFzEB";
+    if(user.role === "admin")
+    return next (new ErrorHandler("Admin can't buy subscription", 400));
+    const plan_id = process.env.PLAN_ID || "plan_NFmb0KYfgoFzEB"
     const subscription = await instance.subscriptions.create({
-      plan_id,
-      customer_notify: 1,
-      total_count: 12,
+        plan_id,
+        customer_notify:1,
+        total_count:12,
     });
-
     user.subscription.id = subscription.id;
     user.subscription.status = subscription.status;
-
-    // Check if the course is already purchased
-    if (!user.purchasedCourses.includes(courseId)) {
-      user.purchasedCourses.push(courseId); // Add purchased course to user profile
-    }
-
     await user.save();
-
     res.status(200).json({
-      success: true,
-      subscriptionId: subscription.id,
+        success:true,
+        subscriptionId: subscription.id,
     });
 });
-
 
 export const paymentVarification = catchAsyncError(async(req, res, next) => {
     const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id } = req.body;
