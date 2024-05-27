@@ -40,7 +40,7 @@ export const paymentVarification = catchAsyncError(async(req, res, next) => {
     if (!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/paymentfail`);
 
     // Save payment information to the database
-    await Payment.create({ razorpay_payment_id, razorpay_signature, razorpay_subscription_id, courseId });
+    await Payment.create({ razorpay_payment_id, razorpay_signature, razorpay_subscription_id });
 
     user.subscription.status = "active";
 
