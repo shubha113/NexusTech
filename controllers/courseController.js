@@ -26,6 +26,8 @@ export const getAllCourses = catchAsyncError(async (req, res, next) => {
 });
 
 
+
+
 export const createCourse = catchAsyncError(async (req, res, next) => {
   const { title, description, category, createdBy } = req.body;
 
@@ -56,6 +58,7 @@ export const createCourse = catchAsyncError(async (req, res, next) => {
 });
 
 export const getCourseLectures = catchAsyncError(async (req, res, next) => {
+  
   const course = await Course.findById(req.params.id);
 
   if (!course) return next(new ErrorHandler("Course not found", 404));

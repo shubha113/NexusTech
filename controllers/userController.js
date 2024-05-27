@@ -56,12 +56,12 @@ export const logout = catchAsyncError(async (req, res, next) => {
 });
 
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
-    const user = await User.findById(req.user._id);
-    res.status(200).json({
-        success: true,
-        user
-      });
+  const user = await User.findById(req.user._id);
+  res.status(200).json({
+      success: true,
+      user
   });
+});
 
 export const changePassword = catchAsyncError(async (req, res, next) => {
     const {oldPassword, newPassword} = req.body;
@@ -153,7 +153,7 @@ export const addToPlaylist = catchAsyncError(async (req, res, next) => {
       success: true,
       message: "Added to playlist",
     });
-  });
+  }); 
 
 export const removeFromPlaylist = catchAsyncError(async(req, res, next)=>{
     const user = await User.findById(req.user._id);
@@ -218,6 +218,9 @@ export const deleteMyProfile = catchAsyncError(async(req, res, next)=>{
     message:"User Deleted Succesfully",
   });
 });
+
+//to show the buyed course in pofile
+
 
 //we are making watcher, so that if there is any real time data update then we can update it through this function
 User.watch().on("change", async ()=>{
