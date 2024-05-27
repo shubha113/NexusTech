@@ -60,11 +60,15 @@ export const createCourse = catchAsyncError(async (req, res, next) => {
 export const getCourseLectures = catchAsyncError(async (req, res, next) => {
   
   const course = await Course.findById(req.params.id);
-
   if (!course) return next(new ErrorHandler("Course not found", 404));
 
-  course.views += 1;
+  // Check if the course is in the user's purchased courses list
+  const user = await User.findById(req.user._id).populate('purchasedCourses');
+  if (!user.purchasedCourses.map(course => course._id.toString()).includes(req.params.id)) {
+    return next(new ErrorHandler("Access denied. You have not purchased this course.", 403));
+  }
 
+  course.views += 1;
   await course.save();
 
   res.status(200).json({

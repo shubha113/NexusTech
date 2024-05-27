@@ -219,9 +219,6 @@ export const deleteMyProfile = catchAsyncError(async(req, res, next)=>{
   });
 });
 
-//to show the buyed course in pofile
-
-
 //we are making watcher, so that if there is any real time data update then we can update it through this function
 User.watch().on("change", async ()=>{
   const stats = await Stats.find({}).sort({createdAt: "desc"}).limit(1);
