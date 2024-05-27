@@ -58,15 +58,22 @@ export const createCourse = catchAsyncError(async (req, res, next) => {
 });
 
 export const getCourseLectures = catchAsyncError(async (req, res, next) => {
-  
-  const course = await Course.findById(req.params.id);
+  const courseId = req.params.id; // Extract course ID from URL parameters
+  const user = await User.findById(req.user._id); // Fetch the logged-in user's details
 
+  // Check if the user has purchased the course
+  if (!user.purchasedCourses.includes(courseId)) {
+    return next(new ErrorHandler("You have not purchased this course", 403));
+  }
+
+  // Fetch the course details from the database
+  const course = await Course.findById(courseId);
   if (!course) return next(new ErrorHandler("Course not found", 404));
 
-  course.views += 1;
+  course.views += 1; // Increment the course views count
+  await course.save(); // Save the updated course details
 
-  await course.save();
-
+  // Send the course lectures in the response
   res.status(200).json({
     success: true,
     lectures: course.lectures,
