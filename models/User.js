@@ -56,6 +56,11 @@ const schema = new mongoose.Schema({
             ref: "Course",
         }
     ],
+    accessibleCourses: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Course',
+        default: []
+      },
     createdAt:{
         type:Date,
         default:Date.now,
