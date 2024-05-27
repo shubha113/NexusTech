@@ -62,11 +62,6 @@ export const getCourseLectures = catchAsyncError(async (req, res, next) => {
 
   if (!course) return next(new ErrorHandler("Course not found", 404));
 
-  // Check if the user has purchased the course
-  if (!req.user.purchasedCourses.includes(course._id)) {
-    return next(new ErrorHandler("Access denied. You have not purchased this course", 403));
-  }
-
   course.views += 1;
   await course.save();
 
