@@ -5,50 +5,62 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
-export const buySubscription = catchAsyncError(async(req, res, next)=>{
+// controllers/paymentController.js
+export const buySubscription = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id);
-    if(user.role === "admin")
-    return next (new ErrorHandler("Admin can't buy subscription", 400));
-    const plan_id = process.env.PLAN_ID || "plan_NFmb0KYfgoFzEB"
+    const { courseId } = req.body; // Assuming courseId is passed in the request body
+  
+    if (user.role === "admin")
+      return next(new ErrorHandler("Admin can't buy subscription", 400));
+  
+    const plan_id = process.env.PLAN_ID || "plan_NFmb0KYfgoFzEB";
     const subscription = await instance.subscriptions.create({
-        plan_id,
-        customer_notify:1,
-        total_count:12,
+      plan_id,
+      customer_notify: 1,
+      total_count: 12,
     });
+  
     user.subscription.id = subscription.id;
     user.subscription.status = subscription.status;
     await user.save();
+  
     res.status(200).json({
-        success:true,
-        subscriptionId: subscription.id,
+      success: true,
+      subscriptionId: subscription.id,
+      courseId, // Return courseId in the response
     });
-});
+  });
+  
 
-export const paymentVarification = catchAsyncError(async(req, res, next) => {
-    const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id } = req.body;
-
-
+// controllers/paymentController.js
+export const paymentVarification = catchAsyncError(async (req, res, next) => {
+    const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id, courseId } = req.body;
+  
     const user = await User.findById(req.user._id);
     const subscription_id = user.subscription.id;
     const generated_signature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_API_SECRET)
-        .update(razorpay_payment_id + "|" + subscription_id, "utf-8")
-        .digest("hex");
-
+      .createHmac("sha256", process.env.RAZORPAY_API_SECRET)
+      .update(razorpay_payment_id + "|" + subscription_id, "utf-8")
+      .digest("hex");
+  
     const isAuthentic = generated_signature === razorpay_signature;
-
+  
     if (!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/paymentfail`);
-
+  
     // Save payment information to the database
     await Payment.create({ razorpay_payment_id, razorpay_signature, razorpay_subscription_id, courseId });
-
-    user.subscription.status = "active";
-
+  
+    user.subscription.status = "active"; 
+    // Add the courseId to the user's accessible courses
+    if (!user.accessibleCourses.includes(courseId)) {
+        user.accessibleCourses.push(courseId);
+    }
+  
     await user.save();
-
+  
     res.redirect(`${process.env.FRONTEND_URL}/paymentsuccess?reference=${razorpay_payment_id}`);
-});
-
+  });
+  
 export const getRazorpayKey = catchAsyncError(async(req, res, next)=>{
     res.status(200).json({
         success:true,
