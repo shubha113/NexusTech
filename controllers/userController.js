@@ -219,20 +219,6 @@ export const deleteMyProfile = catchAsyncError(async(req, res, next)=>{
   });
 });
 
-//to show the buyed course in pofile
-export const getPurchasedCourses = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate('purchasedCourses');
-
-  if (!user) {
-    return next(new ErrorHandler("User not found", 404));
-  }
-
-  res.status(200).json({
-    success: true,
-    purchasedCourses: user.purchasedCourses,
-  });
-});
-
 
 //we are making watcher, so that if there is any real time data update then we can update it through this function
 User.watch().on("change", async ()=>{
