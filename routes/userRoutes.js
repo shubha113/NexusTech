@@ -1,5 +1,5 @@
 import express from 'express';
-import { addToPlaylist, changePassword, deleteMyProfile, deleteUser, forgetPassword, getAllUsers, getMyProfile, getPurchasedCourses, login, logout, register, removeFromPlaylist, resetPassword, updateProfile, updateProfilePicture, updateUserRole } from '../controllers/userController.js';
+import { addToPlaylist, changePassword, deleteMyProfile, deleteUser, forgetPassword, getAllUsers, getMyProfile, login, logout, register, removeFromPlaylist, resetPassword, updateProfile, updateProfilePicture, updateUserRole } from '../controllers/userController.js';
 import {authorizeAdmin, isAuthenticated} from '../middlewares/auth.js';
 import singleUpload from '../middlewares/multer.js';
 
@@ -14,8 +14,6 @@ router.route('/login').post(login);
 router.route('/logout').get(logout);
 //get my profile
 router.route('/me').get(isAuthenticated, getMyProfile);
-// Get purchased courses
-router.route('/me/purchased-courses').get(isAuthenticated, getPurchasedCourses);
 //delete my profile
 router.route('/me').delete(isAuthenticated, deleteMyProfile);
 //change password
