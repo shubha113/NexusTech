@@ -1,11 +1,13 @@
+
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
+import { Course } from "../models/Course.js";
 import { Payment } from "../models/Payment.js";
 import { User } from "../models/User.js";
 import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
-
+// controllers/paymentController.js
 export const buySubscription = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   const courseId = req.params.courseId;
@@ -19,7 +21,7 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("You have already subscribed to this course", 400));
   }
 
-  const subscription = await razorpayInstance.subscription.create({
+  const subscription = await instance.subscription.create({
     plan_id: process.env.RAZORPAY_PLAN_ID,
     customer_notify: 1,
     total_count: 12,
@@ -72,7 +74,8 @@ export const paymentVarification = catchAsyncError(async (req, res, next) => {
   });
 });
 
-
+  
+  
 export const getRazorpayKey = catchAsyncError(async(req, res, next)=>{
     res.status(200).json({
         success:true,
