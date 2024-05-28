@@ -7,39 +7,44 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
-// controllers/paymentController.js
 export const buySubscription = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  const courseId = req.params.courseId;
-  const course = await Course.findById(courseId);
+  try {
+    // Ensure that req.user is populated with the necessary fields, including id
+    const user = await User.findById(req.user.id).populate("subscription.courseId"); // Populate the subscription field
+    const courseId = req.params.courseId;
+    const course = await Course.findById(courseId);
 
-  if (!course) {
-    return next(new ErrorHandler("Course not found", 404));
+    if (!course) {
+      return next(new ErrorHandler("Course not found", 404));
+    }
+
+    if (user.subscription.some(sub => sub.courseId.toString() === courseId)) {
+      return next(new ErrorHandler("You have already subscribed to this course", 400));
+    }
+
+    const subscription = await instance.subscription.create({
+      plan_id: process.env.RAZORPAY_PLAN_ID,
+      customer_notify: 1,
+      total_count: 12,
+    });
+
+    user.subscription.push({
+      courseId: courseId,
+      subscriptionId: subscription.id,
+      status: subscription.status,
+    });
+
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      subscriptionId: subscription.id,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  if (user.subscription.some(sub => sub.courseId.toString() === courseId)) {
-    return next(new ErrorHandler("You have already subscribed to this course", 400));
-  }
-
-  const subscription = await instance.subscription.create({
-    plan_id: process.env.RAZORPAY_PLAN_ID,
-    customer_notify: 1,
-    total_count: 12,
-  });
-
-  user.subscription.push({
-    courseId: courseId,
-    subscriptionId: subscription.id,
-    status: subscription.status,
-  });
-
-  await user.save();
-
-  res.status(201).json({
-    success: true,
-    subscriptionId: subscription.id,
-  });
 });
+
 
 // controllers/paymentController.js
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
