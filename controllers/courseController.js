@@ -1,9 +1,9 @@
-import { catchAsyncError } from "../Middleware/catchAsyncError.js";
-import { Course } from "../Models/Course.js";
-import ErrorHandler from "../Utils/ErrorHandler.js";
-import cloudinary from "cloudinary";
-import getDataUri from "../Utils/DataUri.js";
-import { Stats } from "../Models/Stats.js";
+import { catchAsyncError } from "../middlewares/catchAsyncError.js";
+import { Course } from "../models/Course.js";
+import { Stats } from "../models/Stats.js";
+import getDataUri from "../utils/dataUri.js";
+import ErrorHandler from "../utils/errorHandler.js";
+import cloudinary from 'cloudinary';
 
 export const getAllCourses = catchAsyncError(async (req, res, next) => {
   const keyword = req.query.keyword || "";
@@ -24,6 +24,9 @@ export const getAllCourses = catchAsyncError(async (req, res, next) => {
     courses,
   });
 });
+
+
+
 
 export const createCourse = catchAsyncError(async (req, res, next) => {
   const { title, description, category, createdBy } = req.body;
@@ -55,6 +58,7 @@ export const createCourse = catchAsyncError(async (req, res, next) => {
 });
 
 export const getCourseLectures = catchAsyncError(async (req, res, next) => {
+  
   const course = await Course.findById(req.params.id);
 
   if (!course) return next(new ErrorHandler("Course not found", 404));
@@ -120,7 +124,7 @@ export const deleteCourse = catchAsyncError(async (req, res, next) => {
     });
   }
 
-  await course.remove();
+  await course.deleteOne();
 
   res.status(200).json({
     success: true,
