@@ -1,9 +1,9 @@
-import { catchAsyncError } from "../middlewares/catchAsyncError.js";
-import { Course } from "../models/Course.js";
-import { Stats } from "../models/Stats.js";
-import getDataUri from "../utils/dataUri.js";
-import ErrorHandler from "../utils/errorHandler.js";
-import cloudinary from 'cloudinary';
+import { catchAsyncError } from "../Middleware/catchAsyncError.js";
+import { Course } from "../Models/Course.js";
+import ErrorHandler from "../Utils/ErrorHandler.js";
+import cloudinary from "cloudinary";
+import getDataUri from "../Utils/DataUri.js";
+import { Stats } from "../Models/Stats.js";
 
 export const getAllCourses = catchAsyncError(async (req, res, next) => {
   const keyword = req.query.keyword || "";
@@ -24,9 +24,6 @@ export const getAllCourses = catchAsyncError(async (req, res, next) => {
     courses,
   });
 });
-
-
-
 
 export const createCourse = catchAsyncError(async (req, res, next) => {
   const { title, description, category, createdBy } = req.body;
@@ -62,13 +59,8 @@ export const getCourseLectures = catchAsyncError(async (req, res, next) => {
 
   if (!course) return next(new ErrorHandler("Course not found", 404));
 
-  // Check if the course is in the user's purchased courses list
-  const user = await User.findById(req.user._id).populate('purchasedCourses');
-  if (!user.purchasedCourses.map(course => course._id.toString()).includes(req.params.id)) {
-    return next(new ErrorHandler("Access denied. You have not purchased this course.", 403));
-  }
-
   course.views += 1;
+
   await course.save();
 
   res.status(200).json({
@@ -128,7 +120,7 @@ export const deleteCourse = catchAsyncError(async (req, res, next) => {
     });
   }
 
-  await course.deleteOne();
+  await course.remove();
 
   res.status(200).json({
     success: true,
@@ -162,13 +154,6 @@ export const deleteLecture = catchAsyncError(async (req, res, next) => {
     message: "Lecture Deleted Successfully",
   });
 });
-
-
-
-
-
-
-
 
 Course.watch().on("change", async () => {
   let stats = await Stats.find({}).sort({ createdAt: "desc" }).limit(1);
