@@ -6,29 +6,37 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
-export const buySubscription = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.user._id);
-  if (user.role === "admin") return next(new ErrorHandler("Admin can't buy courses", 400));
+export const buySubscription = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
 
-  const { courseId } = req.body;  // Accept courseId from the request body
+  const courseId = req.params.courseId;
   const course = await Course.findById(courseId);
-  if (!course) return next(new ErrorHandler("Course not found", 404));
 
-  const plan_id = process.env.PLAN_ID || "plan_NFmb0KYfgoFzEB";
-  const subscription = await instance.subscriptions.create({
-      plan_id,
-      customer_notify: 1,
-      total_count: 12,
+  if (!course) {
+    return next(new ErrorHandler("Course not found", 404));
+  }
+
+  if (user.purchasedCourses.includes(courseId)) {
+    return next(new ErrorHandler("You have already subscribed to this course", 400));
+  }
+
+  const subscription = await razorpayInstance.subscriptions.create({
+    plan_id: process.env.RAZORPAY_PLAN_ID,
+    customer_notify: 1,
+    total_count: 12,
   });
 
-  user.subscription.id = subscription.id;
-  user.subscription.status = subscription.status;
-  user.purchasedCourses.push(courseId);  // Add the course to the user's purchased courses
+  user.subscription = {
+    id: subscription.id,
+    status: subscription.status,
+  };
+  user.purchasedCourses.push(courseId);  // Add courseId to purchasedCourses
+
   await user.save();
 
-  res.status(200).json({
-      success: true,
-      subscriptionId: subscription.id,
+  res.status(201).json({
+    success: true,
+    subscriptionId: subscription.id,
   });
 });
 export const paymentVarification = catchAsyncError(async(req, res, next)=>{
