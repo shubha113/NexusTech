@@ -11,5 +11,5 @@ router.route("/paymentverification").post(isAuthenticated, paymentVarification)
 //verify payment and save reference in database
 router.route("/razorpaykey").get(getRazorpayKey);
 //cancel subscription
-router.route("/subscribe/cancel/:courseId").delete(isAuthenticated, cancelSubscription);
+router.route("/subscribe/cancel").delete(isAuthenticated, cancelSubscription);
 export default router;
