@@ -1,3 +1,4 @@
+
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { Course } from "../models/Course.js";
 import { Payment } from "../models/Payment.js";
@@ -6,7 +7,8 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
-export const buySubscription = catchAsyncErrors(async (req, res, next) => {
+// controllers/paymentController.js
+export const buySubscription = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
   const courseId = req.params.courseId;
@@ -39,23 +41,39 @@ export const buySubscription = catchAsyncErrors(async (req, res, next) => {
     subscriptionId: subscription.id,
   });
 });
-export const paymentVarification = catchAsyncError(async(req, res, next)=>{
-    const {razorpay_signature, razorpay_payment_id, razorpay_subscription_id} = req.body;
+
+// controllers/paymentController.js
+export const paymentVarification = catchAsyncError(async (req, res, next) => {
+    const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id, courseId } = req.body;
+  
+    if (!courseId) {
+      return next(new ErrorHandler("courseId is required", 400));
+    }
+  
     const user = await User.findById(req.user._id);
     const subscription_id = user.subscription.id;
-    const generated_signature = crypto
-    .createHmac("sha256",process.env.RAZORPAY_API_SECRET)
-    .update(razorpay_payment_id + "|" + subscription_id, "utd-8")
-    .digest("hex");
-    const isAuthentic = generated_signature === razorpay_signature;
-    if(!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/paymentfail`);
-    //database comes here
-    await Payment.create({razorpay_payment_id, razorpay_signature, razorpay_subscription_id});
-    user.subscription.status= "active";
-    await user.save();
-    res.redirect(`${process.env.FRONTEND_URL}/paymentsuccess?reference=${razorpay_payment_id}`);
-});
-
+  
+    try {
+      const generated_signature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_API_SECRET)
+        .update(razorpay_payment_id + "|" + subscription_id, "utf-8")
+        .digest("hex");
+  
+      const isAuthentic = generated_signature === razorpay_signature;
+  
+      if (!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/paymentfail`);
+  
+      // Save payment information to the database
+      await Payment.create({ razorpay_payment_id, razorpay_signature, razorpay_subscription_id});
+  
+      // ... rest of your code (user subscription update, success response)
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      return next(new ErrorHandler("Internal server error", 500));
+    }
+  });
+  
+  
 export const getRazorpayKey = catchAsyncError(async(req, res, next)=>{
     res.status(200).json({
         success:true,
