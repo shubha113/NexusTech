@@ -72,6 +72,14 @@ export const paymentVarification = catchAsyncError(async (req, res, next) => {
   });
 });
 
+
+export const getRazorpayKey = catchAsyncError(async(req, res, next)=>{
+    res.status(200).json({
+        success:true,
+        key:process.env.RAZORPAY_API_KEY,
+    });
+});
+
 export const cancelSubscription = catchAsyncError(async(req, res, next)=>{
     const user = await User.findById(req.user._id);
     console.log("User Document:", user);
