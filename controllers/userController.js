@@ -57,25 +57,9 @@ export const logout = catchAsyncError(async (req, res, next) => {
 
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
-
-  const subscribedCourses = await Promise.all(
-    user.subscription.map(async (sub) => {
-      const course = await Course.findById(sub.courseId).select("title poster");
-      return {
-        courseId: sub.courseId,
-        title: course.title,
-        poster: course.poster.url,
-        progress: Math.floor(Math.random() * 100), // Replace with actual progress logic
-      };
-    })
-  );
-
   res.status(200).json({
-    success: true,
-    user: {
-      ...user._doc,
-      subscription: subscribedCourses,
-    },
+      success: true,
+      user
   });
 });
 
