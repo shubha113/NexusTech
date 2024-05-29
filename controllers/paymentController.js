@@ -9,16 +9,20 @@ import crypto from "crypto";
 
 // controllers/paymentController.js
 export const buySubscription = catchAsyncError(async (req, res, next) => {
+  console.log("User ID:", req.user.id); // Log user ID
+  console.log("Course ID:", req.params.courseId); // Log course ID
   try {
     const user = await User.findById(req.user.id).populate("subscription.courseId");
     const courseId = req.params.courseId;
     const course = await Course.findById(courseId);
 
     if (!course) {
+      console.error("Course not found for ID:", courseId);
       return next(new ErrorHandler("Course not found", 404));
     }
 
     if (user.subscription.some(sub => sub.courseId.toString() === courseId)) {
+      console.error("User has already subscribed to the course:", courseId);
       return next(new ErrorHandler("You have already subscribed to this course", 400));
     }
 
@@ -41,9 +45,11 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
       subscriptionId: subscription.id,
     });
   } catch (error) {
+    console.error("Error in buySubscription controller:", error); // Log error
     next(error);
   }
 });
+
 
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
   const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id, courseId } = req.body;
