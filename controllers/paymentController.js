@@ -7,6 +7,7 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
+// controllers/paymentController.js
 export const buySubscription = catchAsyncError(async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).populate("subscription.courseId");
@@ -21,7 +22,7 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
       return next(new ErrorHandler("You have already subscribed to this course", 400));
     }
 
-    const subscription = await instance.subscription.create({
+    const subscription = await instance.subscriptions.create({
       plan_id: process.env.RAZORPAY_PLAN_ID,
       customer_notify: 1,
       total_count: 12,
