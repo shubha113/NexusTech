@@ -57,9 +57,23 @@ export const logout = catchAsyncError(async (req, res, next) => {
 
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
+
+  const subscribedCourses = await Promise.all(
+    user.subscription.map(async (sub) => {
+      const course = await Course.findById(sub.courseId).select("title poster");
+      return {
+        courseId: sub.courseId,
+        title: course.title,
+        poster: course.poster.url,
+        progress: Math.floor(Math.random() * 100), // Replace with actual progress logic
+      };
+    })
+  );
+
   res.status(200).json({
-      success: true,
-      user
+    success: true,
+    user,
+    subscribedCourses,
   });
 });
 
@@ -225,7 +239,7 @@ export const deleteMyProfile = catchAsyncError(async(req, res, next)=>{
 //we are making watcher, so that if there is any real time data update then we can update it through this function
 User.watch().on("change", async ()=>{
   const stats = await Stats.find({}).sort({createdAt: "desc"}).limit(1);
-  const subscription = await User.find({"subscription.status":"active"});
+  const subscription = await User.find({"subscription.status":"created"});
   stats[0].users = await User.countDocuments();
   stats[0].subscription = subscription.length;
   stats[0].createdAt = new Date(Date.now());
