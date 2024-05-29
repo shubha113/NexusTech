@@ -9,8 +9,7 @@ import crypto from "crypto";
 
 export const buySubscription = catchAsyncError(async (req, res, next) => {
   try {
-    // Ensure that req.user is populated with the necessary fields, including id
-    const user = await User.findById(req.user.id).populate("subscription.courseId"); // Populate the subscription field
+    const user = await User.findById(req.user.id).populate("subscription.courseId");
     const courseId = req.params.courseId;
     const course = await Course.findById(courseId);
 
@@ -45,8 +44,6 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
   }
 });
 
-
-// controllers/paymentController.js
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
   const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id, courseId } = req.body;
 
@@ -70,7 +67,6 @@ export const paymentVarification = catchAsyncError(async (req, res, next) => {
 
   if (!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/paymentfail`);
 
-  // Save payment information to the database
   await Payment.create({ razorpay_payment_id, razorpay_signature, razorpay_subscription_id });
 
   res.status(200).json({
@@ -78,7 +74,6 @@ export const paymentVarification = catchAsyncError(async (req, res, next) => {
     message: "Payment verified successfully",
   });
 });
-
   
   
 export const getRazorpayKey = catchAsyncError(async(req, res, next)=>{
