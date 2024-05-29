@@ -7,10 +7,10 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
-// controllers/paymentController.js
 export const buySubscription = catchAsyncError(async (req, res, next) => {
   console.log("User ID:", req.user.id); // Log user ID
   console.log("Course ID:", req.params.courseId); // Log course ID
+  
   try {
     const user = await User.findById(req.user.id).populate("subscription.courseId");
     const courseId = req.params.courseId;
@@ -49,6 +49,7 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     next(error);
   }
 });
+
 
 
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
