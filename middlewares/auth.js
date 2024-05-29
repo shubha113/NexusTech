@@ -33,19 +33,19 @@ export const authorizeAdmin = catchAsyncError(async (req, res, next) => {
   });
 
   export const authorizeSubscribers = catchAsyncError(async (req, res, next) => {
-    // Check if the user is an admin
     if (req.user.role === "admin") {
       return next();
     }
   
-    // Check if the user has any subscriptions
     if (!req.user.subscription || req.user.subscription.length === 0) {
       return next(new ErrorHandler("Only Subscribers can access this resource", 403));
     }
   
-    // Check if any subscription is active
-    const isActiveSubscriber = req.user.subscription.some(sub => sub.status === "active");
-    
+    const courseId = req.params.id;
+    const isActiveSubscriber = req.user.subscription.some(
+      sub => sub.courseId.toString() === courseId && sub.status === "active"
+    );
+  
     if (!isActiveSubscriber) {
       return next(new ErrorHandler("Only Subscribers can access this resource", 403));
     }
