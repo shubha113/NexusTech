@@ -14,8 +14,11 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
   
   try {
     const user = await User.findById(req.user.id).populate("subscription.courseId");
+    console.log("User found:", user);
+
     const courseId = req.params.courseId;
     const course = await Course.findById(courseId);
+    console.log("Course found:", course);
 
     if (!course) {
       console.error("Course not found for ID:", courseId);
@@ -27,11 +30,13 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
       return next(new ErrorHandler("You have already subscribed to this course", 400));
     }
 
+    console.log("Creating subscription with plan ID:", process.env.PLAN_ID);
     const subscription = await instance.subscriptions.create({
       plan_id: process.env.PLAN_ID,
       customer_notify: 1,
       total_count: 12,
     });
+    console.log("Subscription created:", subscription);
 
     user.subscription.push({
       courseId: courseId,
@@ -40,6 +45,7 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     });
 
     await user.save();
+    console.log("User subscription saved");
 
     res.status(201).json({
       success: true,
@@ -50,6 +56,7 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     next(error);
   }
 });
+
 
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
   const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id } = req.body;
