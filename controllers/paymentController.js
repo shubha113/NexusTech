@@ -53,7 +53,8 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
 
 
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
-  const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id, courseId } = req.body;
+  const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id } = req.body;
+  const { courseId } = req.query;  // Get courseId from query parameters
 
   if (!courseId) {
     return next(new ErrorHandler("courseId is required", 400));
@@ -82,6 +83,7 @@ export const paymentVarification = catchAsyncError(async (req, res, next) => {
     message: "Payment verified successfully",
   });
 });
+
   
   
 export const getRazorpayKey = catchAsyncError(async(req, res, next)=>{
