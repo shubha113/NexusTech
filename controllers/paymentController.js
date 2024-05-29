@@ -6,47 +6,51 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
+// controllers/paymentController.js
 export const buySubscription = catchAsyncError(async (req, res, next) => {
-  const userId = req.user._id;
-  const courseId = req.params.courseId;
+  console.log("User ID:", req.user.id); // Log user ID
+  console.log("Course ID:", req.params.courseId); // Log course ID
   
-  const user = await User.findById(userId);
-  const course = await Course.findById(courseId);
+  try {
+    const user = await User.findById(req.user.id).populate("subscription.courseId");
+    const courseId = req.params.courseId;
+    const course = await Course.findById(courseId);
 
-  if (!course) {
-    return next(new ErrorHandler("Course not found", 404));
+    if (!course) {
+      console.error("Course not found for ID:", courseId);
+      return next(new ErrorHandler("Course not found", 404));
+    }
+
+    // Check if user is already subscribed to the course
+    if (user.subscription.some(sub => sub.courseId.toString() === courseId)) {
+      console.error("User has already subscribed to the course:", courseId);
+      return next(new ErrorHandler("You have already subscribed to this course", 400));
+    }
+
+    // Proceed with subscription creation
+    const subscription = await instance.subscriptions.create({
+      plan_id: process.env.PLAN_ID,
+      customer_notify: 1,
+      total_count: 12,
+    });
+
+    user.subscription.push({
+      courseId: courseId,
+      subscriptionId: subscription.id,
+      status: subscription.status,
+    });
+
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      subscriptionId: subscription.id,
+    });
+  } catch (error) {
+    console.error("Error in buySubscription controller:", error); // Log error
+    next(error);
   }
-
-  // Check if user is already subscribed to the course
-  const isAlreadySubscribed = user.subscription.some(
-    sub => sub.courseId.toString() === courseId && sub.status === "active"
-  );
-
-  if (isAlreadySubscribed) {
-    return next(new ErrorHandler("You are already subscribed to this course", 400));
-  }
-
-  // Proceed with subscription creation
-  const subscription = await instance.subscriptions.create({
-    plan_id: process.env.PLAN_ID,
-    customer_notify: 1,
-    total_count: 12,
-  });
-
-  user.subscription.push({
-    courseId,
-    subscriptionId: subscription.id,
-    status: subscription.status,
-  });
-
-  await user.save();
-
-  res.status(201).json({
-    success: true,
-    subscriptionId: subscription.id,
-  });
 });
-
 
 
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
