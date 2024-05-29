@@ -7,6 +7,7 @@ import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 
+// controllers/paymentController.js
 export const buySubscription = catchAsyncError(async (req, res, next) => {
   console.log("User ID:", req.user.id); // Log user ID
   console.log("Course ID:", req.params.courseId); // Log course ID
@@ -27,7 +28,7 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     }
 
     const subscription = await instance.subscriptions.create({
-      plan_id,
+      plan_id: process.env.PLAN_ID,
       customer_notify: 1,
       total_count: 12,
     });
@@ -49,7 +50,6 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     next(error);
   }
 });
-
 
 
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
