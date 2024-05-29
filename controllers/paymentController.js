@@ -27,7 +27,7 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     }
 
     const subscription = await instance.subscriptions.create({
-      plan_id: process.env.RAZORPAY_PLAN_ID,
+      plan_id,
       customer_notify: 1,
       total_count: 12,
     });
