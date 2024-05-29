@@ -1,3 +1,4 @@
+
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { Course } from "../models/Course.js";
 import { Payment } from "../models/Payment.js";
@@ -21,13 +22,11 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
       return next(new ErrorHandler("Course not found", 404));
     }
 
-    // Check if user is already subscribed to the course
     if (user.subscription.some(sub => sub.courseId.toString() === courseId)) {
       console.error("User has already subscribed to the course:", courseId);
       return next(new ErrorHandler("You have already subscribed to this course", 400));
     }
 
-    // Proceed with subscription creation
     const subscription = await instance.subscriptions.create({
       plan_id: process.env.PLAN_ID,
       customer_notify: 1,
@@ -51,7 +50,6 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     next(error);
   }
 });
-
 
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
   const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id } = req.body;
