@@ -3,6 +3,7 @@ import { Course } from "../models/Course.js";
 import { User } from "../models/User.js";
 import { instance } from "../server.js";
 import ErrorHandler from "../utils/errorHandler.js";
+import crypto from "crypto";
 
 export const buySubscription = catchAsyncError(async (req, res, next) => {
   const userId = req.user._id;
