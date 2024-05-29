@@ -81,10 +81,9 @@ export const paymentVarification = catchAsyncError(async (req, res, next) => {
 
   await Payment.create({ razorpay_payment_id, razorpay_signature, razorpay_subscription_id });
 
-  res.status(200).json({
-    success: true,
-    message: "Payment verified successfully",
-  });
+  user.subscription.status= "active";
+    await user.save();
+    res.redirect(`${process.env.FRONTEND_URL}/paymentsuccess?reference=${razorpay_payment_id}`);
 });
 
 
