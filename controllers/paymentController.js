@@ -14,29 +14,26 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
   
   try {
     const user = await User.findById(req.user.id).populate("subscription.courseId");
-    console.log("User found:", user);
-
     const courseId = req.params.courseId;
     const course = await Course.findById(courseId);
-    console.log("Course found:", course);
 
     if (!course) {
       console.error("Course not found for ID:", courseId);
       return next(new ErrorHandler("Course not found", 404));
     }
 
+    // Check if user is already subscribed to the course
     if (user.subscription.some(sub => sub.courseId.toString() === courseId)) {
       console.error("User has already subscribed to the course:", courseId);
       return next(new ErrorHandler("You have already subscribed to this course", 400));
     }
 
-    console.log("Creating subscription with plan ID:", process.env.PLAN_ID);
+    // Proceed with subscription creation
     const subscription = await instance.subscriptions.create({
       plan_id: process.env.PLAN_ID,
       customer_notify: 1,
       total_count: 12,
     });
-    console.log("Subscription created:", subscription);
 
     user.subscription.push({
       courseId: courseId,
@@ -45,7 +42,6 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     });
 
     await user.save();
-    console.log("User subscription saved");
 
     res.status(201).json({
       success: true,
@@ -58,9 +54,10 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
 });
 
 
+
 export const paymentVarification = catchAsyncError(async (req, res, next) => {
   const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id } = req.body;
-  const { courseId } = req.query;  // Get courseId from query parameters
+  const { courseId } = req.query;
 
   if (!courseId) {
     return next(new ErrorHandler("courseId is required", 400));
@@ -84,11 +81,8 @@ export const paymentVarification = catchAsyncError(async (req, res, next) => {
 
   await Payment.create({ razorpay_payment_id, razorpay_signature, razorpay_subscription_id });
 
-  user.subscription.status= "active";
-    await user.save();
-    res.redirect(`${process.env.FRONTEND_URL}/paymentsuccess?reference=${razorpay_payment_id}`);
+  res.redirect(`${process.env.FRONTEND_URL}/paymentsuccess?courseId=${courseId}`);
 });
-
 
   
   
