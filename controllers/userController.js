@@ -55,19 +55,51 @@ export const logout = catchAsyncError(async (req, res, next) => {
     });
 });
 
+
+// Modify getMyProfile Controller
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id).populate({
-    path: 'subscription.courseId',
-    model: 'Course',
-    select: 'title description poster'
+      path: 'watchedLectures.courseId',
+      model: 'Course',
+      select: 'title'
   });
 
   res.status(200).json({
-    success: true,
-    user,
-    subscribedCourses: user.subscription.map(sub => sub.courseId)
+      success: true,
+      user,
+      watchedLectures: user.watchedLectures
   });
 });
+
+
+
+
+export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
+  const userId = req.user._id;
+  const { courseId, lectureId } = req.body;
+
+  const user = await User.findById(userId);
+
+  const courseProgress = user.watchedLectures.find(course => course.courseId.toString() === courseId);
+  if (courseProgress) {
+      const lectureProgress = courseProgress.lectures.find(lecture => lecture.lectureId.toString() === lectureId);
+      if (lectureProgress) {
+          lectureProgress.watched = true;
+      } else {
+          courseProgress.lectures.push({ lectureId, watched: true });
+      }
+  } else {
+      user.watchedLectures.push({ courseId, lectures: [{ lectureId, watched: true }] });
+  }
+
+  await user.save();
+
+  res.status(200).json({
+      success: true,
+      message: "Progress updated successfully"
+  });
+});
+
 
 
 export const changePassword = catchAsyncError(async (req, res, next) => {
