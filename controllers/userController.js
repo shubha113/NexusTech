@@ -55,6 +55,7 @@ export const logout = catchAsyncError(async (req, res, next) => {
     });
 });
 
+
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
   try {
     const { courseId, lectureNumber } = req.body;
@@ -78,8 +79,8 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
         }
         if (!courseSubscription.progress.watchedLectures.includes(lectureNumber)) {
           courseSubscription.progress.watchedLectures.push(lectureNumber);
+          await user.save();
         }
-        await user.save();
       }
     }
 
@@ -96,13 +97,40 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
     res.status(200).json({
       success: true,
       user,
-      subscribedCourses: user.subscription.map(sub => sub.courseId),
+      subscribedCourses: user.subscription.map(sub => ({
+        course: sub.courseId,
+        progress: sub.progress ? sub.progress.percentage : 0,
+      })),
     });
   } catch (error) {
     console.error('Error updating course progress or fetching profile:', error);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
+
+// controllers/userController.js
+
+export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
+  try {
+    const { courseId, lectureNumber } = req.body;
+    const user = await User.findById(req.user._id);
+
+    const courseSubscription = user.subscription.find(sub => sub.courseId.toString() === courseId);
+    if (courseSubscription) {
+      // Assuming progress is an array of completed lectures
+      if (!courseSubscription.progress.includes(lectureNumber)) {
+        courseSubscription.progress.push(lectureNumber);
+        await user.save();
+      }
+    }
+
+    res.status(200).json({ success: true, message: 'Lecture marked as watched.' });
+  } catch (error) {
+    console.error('Error updating lecture progress:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+
 
 
 
