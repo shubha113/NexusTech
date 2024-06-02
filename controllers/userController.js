@@ -88,40 +88,6 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
   }
 });
 
-
-// controllers/userController.js
-
-export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
-  try {
-    const { courseId, lectureNumber } = req.body;
-
-    const user = await User.findById(req.user._id);
-
-    const courseSubscription = user.subscription.find(sub => sub.courseId.toString() === courseId);
-    if (courseSubscription) {
-      // Ensure that progress is an object with watchedLectures array
-      if (!courseSubscription.progress) {
-        courseSubscription.progress = {
-          watchedLectures: [],
-          totalLectures: 0 // You should set this elsewhere if it's not set already
-        };
-      }
-
-      const { watchedLectures } = courseSubscription.progress;
-
-      if (!watchedLectures.includes(lectureNumber)) {
-        watchedLectures.push(lectureNumber);
-        await user.save();
-      }
-    }
-
-    res.status(200).json({ success: true, message: 'Lecture marked as watched.' });
-  } catch (error) {
-    console.error('Error updating lecture progress:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
-});
-
 export const changePassword = catchAsyncError(async (req, res, next) => {
     const {oldPassword, newPassword} = req.body;
     if(!oldPassword || !newPassword) return next(new ErrorHandler("Please Enter all fields", 400));
