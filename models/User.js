@@ -36,8 +36,8 @@ const schema = new mongoose.Schema({
           subscriptionId: String,
           status: String,
           progress: {  // Add progress field here
-            watchedLectures: [Number],  // Array to store watched lecture numbers
-            totalLectures: Number,      // Total number of lectures in the course
+            watchedLectures: { type: [Number], default: [] },  // Array to store watched lecture numbers
+            totalLectures: { type: Number, default: 0 },      // Total number of lectures in the course
           },
         },
       ],
