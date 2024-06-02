@@ -55,34 +55,14 @@ export const logout = catchAsyncError(async (req, res, next) => {
     });
 });
 
-
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
   try {
-    const { courseId, lectureNumber } = req.body;
-
     // Find the user by ID
     const user = await User.findById(req.user._id).populate({
       path: 'subscription.courseId',
       model: 'Course',
       select: 'title description poster lectures',
     });
-
-    // Update the progress if courseId and lectureNumber are provided
-    if (courseId && lectureNumber != null) {
-      const courseSubscription = user.subscription.find(sub => sub.courseId.toString() === courseId);
-      if (courseSubscription) {
-        if (!courseSubscription.progress) {
-          courseSubscription.progress = {
-            watchedLectures: [],
-            totalLectures: courseSubscription.courseId.lectures.length,
-          };
-        }
-        if (!courseSubscription.progress.watchedLectures.includes(lectureNumber)) {
-          courseSubscription.progress.watchedLectures.push(lectureNumber);
-          await user.save();
-        }
-      }
-    }
 
     // Calculate progress percentage for each subscribed course
     user.subscription.forEach(sub => {
@@ -103,20 +83,17 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
       })),
     });
   } catch (error) {
-    console.error('Error updating course progress or fetching profile:', error);
+    console.error('Error fetching profile:', error);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
+
 
 // controllers/userController.js
 
 export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
   try {
     const { courseId, lectureNumber } = req.body;
-
-    console.log("Received request body:", req.body);
-    console.log("Received courseId:", courseId);
-    console.log("Received lectureNumber:", lectureNumber);
 
     const user = await User.findById(req.user._id);
 
@@ -126,7 +103,7 @@ export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
       if (!courseSubscription.progress) {
         courseSubscription.progress = {
           watchedLectures: [],
-          totalLectures: 0 // Assuming you set this somewhere else
+          totalLectures: 0 // You should set this elsewhere if it's not set already
         };
       }
 
@@ -144,13 +121,6 @@ export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
-
-
-
-
-
-
-
 
 export const changePassword = catchAsyncError(async (req, res, next) => {
     const {oldPassword, newPassword} = req.body;
