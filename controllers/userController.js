@@ -88,6 +88,7 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
   }
 });
 
+
 export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
   const { courseId, lectureNumber } = req.body;
 
