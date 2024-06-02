@@ -113,6 +113,9 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
 export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
   try {
     const { courseId, lectureNumber } = req.body;
+    
+    console.log("Received courseId:", courseId);
+    console.log("Received lectureNumber:", lectureNumber);
     const user = await User.findById(req.user._id);
 
     const courseSubscription = user.subscription.find(sub => sub.courseId.toString() === courseId);
