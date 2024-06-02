@@ -113,16 +113,27 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
 export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
   try {
     const { courseId, lectureNumber } = req.body;
-    
+
+    console.log("Received request body:", req.body);
     console.log("Received courseId:", courseId);
     console.log("Received lectureNumber:", lectureNumber);
+
     const user = await User.findById(req.user._id);
 
     const courseSubscription = user.subscription.find(sub => sub.courseId.toString() === courseId);
     if (courseSubscription) {
-      // Assuming progress is an array of completed lectures
-      if (!courseSubscription.progress.includes(lectureNumber)) {
-        courseSubscription.progress.push(lectureNumber);
+      // Ensure that progress is an object with watchedLectures array
+      if (!courseSubscription.progress) {
+        courseSubscription.progress = {
+          watchedLectures: [],
+          totalLectures: 0 // Assuming you set this somewhere else
+        };
+      }
+
+      const { watchedLectures } = courseSubscription.progress;
+
+      if (!watchedLectures.includes(lectureNumber)) {
+        watchedLectures.push(lectureNumber);
         await user.save();
       }
     }
@@ -133,6 +144,10 @@ export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
+
+
+
+
 
 
 
