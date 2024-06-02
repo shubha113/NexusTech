@@ -56,18 +56,54 @@ export const logout = catchAsyncError(async (req, res, next) => {
 });
 
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate({
-    path: 'subscription.courseId',
-    model: 'Course',
-    select: 'title description poster'
-  });
+  try {
+    const { courseId, lectureNumber } = req.body;
 
-  res.status(200).json({
-    success: true,
-    user,
-    subscribedCourses: user.subscription.map(sub => sub.courseId)
-  });
+    // Find the user by ID
+    const user = await User.findById(req.user._id).populate({
+      path: 'subscription.courseId',
+      model: 'Course',
+      select: 'title description poster lectures',
+    });
+
+    // Update the progress if courseId and lectureNumber are provided
+    if (courseId && lectureNumber != null) {
+      const courseSubscription = user.subscription.find(sub => sub.courseId.toString() === courseId);
+      if (courseSubscription) {
+        if (!courseSubscription.progress) {
+          courseSubscription.progress = {
+            watchedLectures: [],
+            totalLectures: courseSubscription.courseId.lectures.length,
+          };
+        }
+        if (!courseSubscription.progress.watchedLectures.includes(lectureNumber)) {
+          courseSubscription.progress.watchedLectures.push(lectureNumber);
+        }
+        await user.save();
+      }
+    }
+
+    // Calculate progress percentage for each subscribed course
+    user.subscription.forEach(sub => {
+      if (sub.progress) {
+        const watchedCount = sub.progress.watchedLectures.length;
+        const totalCount = sub.progress.totalLectures;
+        sub.progress.percentage = (watchedCount / totalCount) * 100;
+      }
+    });
+
+    // Send the response with updated user profile
+    res.status(200).json({
+      success: true,
+      user,
+      subscribedCourses: user.subscription.map(sub => sub.courseId),
+    });
+  } catch (error) {
+    console.error('Error updating course progress or fetching profile:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
 });
+
 
 
 export const changePassword = catchAsyncError(async (req, res, next) => {
