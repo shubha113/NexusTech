@@ -17,7 +17,7 @@ router.route('/me').get(isAuthenticated, getMyProfile);
 //delete my profile
 router.route('/me').delete(isAuthenticated, deleteMyProfile);
 //
-router.route('/me/updateProgress').post(isAuthenticated, updateLectureProgress);
+router.route('/me/updateProgress').post( updateLectureProgress);
 //change password
 router.route('/changepassword').put(isAuthenticated, changePassword);
 //update profile
