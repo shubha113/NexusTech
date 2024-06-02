@@ -58,14 +58,34 @@ export const createCourse = catchAsyncError(async (req, res, next) => {
 });
 
 export const getCourseLectures = catchAsyncError(async (req, res, next) => {
-  
-  const course = await Course.findById(req.params.id);
+  const { id } = req.params;
+  const { lectureNumber } = req.query; // Assuming lectureNumber is passed as a query parameter
 
+  const course = await Course.findById(id);
   if (!course) return next(new ErrorHandler("Course not found", 404));
 
   course.views += 1;
-
   await course.save();
+
+  // Update the lecture progress for the user
+  if (lectureNumber != null) {
+    const user = await User.findById(req.user._id);
+    const courseSubscription = user.subscription.find(sub => sub.courseId.toString() === id);
+
+    if (courseSubscription) {
+      if (!courseSubscription.progress) {
+        courseSubscription.progress = {
+          watchedLectures: [],
+          totalLectures: course.lectures.length,
+        };
+      }
+
+      if (!courseSubscription.progress.watchedLectures.includes(Number(lectureNumber))) {
+        courseSubscription.progress.watchedLectures.push(Number(lectureNumber));
+        await user.save();
+      }
+    }
+  }
 
   res.status(200).json({
     success: true,
