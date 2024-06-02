@@ -88,6 +88,34 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
   }
 });
 
+export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
+  const { courseId, lectureNumber } = req.body;
+
+  const user = await User.findById(req.user._id);
+  const course = await Course.findById(courseId);
+
+  if (!course) {
+    return next(new ErrorHandler('Course not found', 404));
+  }
+
+  const courseSubscription = user.subscription.find(sub => sub.courseId.toString() === courseId);
+  if (courseSubscription) {
+    if (!courseSubscription.progress) {
+      courseSubscription.progress = {
+        watchedLectures: [],
+        totalLectures: course.lectures.length
+      };
+    }
+
+    if (!courseSubscription.progress.watchedLectures.includes(lectureNumber)) {
+      courseSubscription.progress.watchedLectures.push(lectureNumber);
+      await user.save();
+    }
+  }
+
+  res.status(200).json({ success: true, message: 'Lecture marked as watched.' });
+});
+
 export const changePassword = catchAsyncError(async (req, res, next) => {
     const {oldPassword, newPassword} = req.body;
     if(!oldPassword || !newPassword) return next(new ErrorHandler("Please Enter all fields", 400));
