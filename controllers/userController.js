@@ -55,9 +55,11 @@ export const logout = catchAsyncError(async (req, res, next) => {
     });
 });
 
+
+// Controller to get user profile data with progress calculations
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
   try {
-    // Find the user by ID
+    // Find the user by ID and populate the course details in subscriptions
     const user = await User.findById(req.user._id).populate({
       path: 'subscription.courseId',
       model: 'Course',
@@ -77,16 +79,13 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
     res.status(200).json({
       success: true,
       user,
-      subscribedCourses: user.subscription.map(sub => ({
-        course: sub.courseId,
-        progress: sub.progress ? sub.progress.percentage : 0,
-      })),
     });
   } catch (error) {
     console.error('Error fetching profile:', error);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
+
 
 
 export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
