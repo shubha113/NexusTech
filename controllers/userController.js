@@ -68,10 +68,11 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
 
     // Calculate progress percentage for each subscribed course
     user.subscription.forEach(sub => {
-      if (sub.progress) {
+      if (sub.courseId && sub.progress) {
+        const totalLectures = sub.courseId.lectures.length;
+        sub.progress.totalLectures = totalLectures;
         const watchedCount = sub.progress.watchedLectures.length;
-        const totalCount = sub.progress.totalLectures;
-        sub.progress.percentage = (watchedCount / totalCount) * 100;
+        sub.progress.percentage = (watchedCount / totalLectures) * 100;
       }
     });
 
@@ -85,6 +86,7 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
+
 
 
 
