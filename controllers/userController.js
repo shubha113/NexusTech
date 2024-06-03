@@ -88,8 +88,6 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
 });
 
 
-
-
 export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
   const { courseId, lectureNumber } = req.body;
 
@@ -115,8 +113,13 @@ export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
     }
   }
 
-  res.status(200).json({ success: true, message: 'Lecture marked as watched.' });
+  // Fetch updated user data
+  const updatedUser = await User.findById(req.user._id);
+
+  res.status(200).json({ success: true, message: 'Lecture marked as watched.', user: updatedUser });
 });
+
+
 
 export const changePassword = catchAsyncError(async (req, res, next) => {
     const {oldPassword, newPassword} = req.body;
