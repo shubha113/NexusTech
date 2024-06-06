@@ -307,7 +307,7 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
     const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
 
     // Use environment variable for the certificates directory
-    const certificatesDir = path.resolve(__dirname, process.env.CERTIFICATES_DIR);
+    const certificatesDir = path.resolve(__dirname, '../../nexustech/src/assets/certificates');
     console.log('Resolved certificatesDir in controller:', certificatesDir); // Debugging
 
     if (!fs.existsSync(certificatesDir)) {
