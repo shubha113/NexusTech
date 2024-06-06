@@ -23,7 +23,9 @@ app.use(cookieParser());
 // Convert the module URL to a file path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use('/controllers/abc', express.static(path.join(__dirname, 'controllers/abc')));
+app.use(process.env.CERTIFICATE_TEMPLATE_PATH, express.static(path.join(__dirname, process.env.CERTIFICATE_TEMPLATE_PATH)));
+
+
 
 //importing and using routes
 import course from "./routes/courseRoutes.js";
@@ -38,6 +40,8 @@ app.use("/api/v1", question);
 app.use("/api/v1", user);
 app.use("/api/v1", payment);
 app.use("/api/v1", other);
+
+
 export default app;
 app.get("/", (req, res) =>
   res.send(
