@@ -23,7 +23,7 @@ export default getDataUri;
 
 
 export const generateCertificate = async (name, courseName, completionDate) => {
-  const filePath = path.resolve(__dirname, process.env.CERTIFICATE_TEMPLATE_PATH, 'Untitled.pdf'); 
+  const filePath = path.resolve(__dirname, process.env.CERTIFICATES_TEMPLATE_PATH); 
   const existingPdfBytes = fs.readFileSync(filePath);
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
 
