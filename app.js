@@ -23,7 +23,7 @@ app.use(cookieParser());
 // Convert the module URL to a file path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use(process.env.CERTIFICATE_TEMPLATE_PATH, express.static(path.join(__dirname, process.env.CERTIFICATE_TEMPLATE_PATH)));
+app.use('/nexustech/src/assets/certiicates/', express.static(path.join(__dirname, process.env.CERTIFICATE_TEMPLATE_PATH)));
 
 
 
