@@ -281,6 +281,38 @@ export const deleteMyProfile = catchAsyncError(async(req, res, next)=>{
 });
 
 
+
+export const generateCourseCertificate = catchAsyncError(async (req, res, next) => {
+  const { userId, courseId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) return next(new ErrorHandler("User not found", 404));
+
+  const course = await Course.findById(courseId);
+  if (!course) return next(new ErrorHandler("Course not found", 404));
+
+  const completionDate = new Date().toLocaleDateString();
+  const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
+
+  // Ensure the abc directory exists (usually you ensure such things at setup or migration)
+  const abcDir = path.resolve(__dirname, '../../nexustech/src/assets/certificates');
+  if (!fs.existsSync(abcDir)) {
+    fs.mkdirSync(abcDir);
+  }
+
+  const filePath = path.resolve(abcDir, `${user.name}_${course.title}_certificate.pdf`);
+  fs.writeFileSync(filePath, pdfBytes);
+
+  res.status(200).json({
+    success: true,
+    message: "Certificate generated successfully",
+    data: {
+      url: `/controllers/abc/${user.name}_${course.title}_certificate.pdf`,
+    },
+  });
+});
+
+
 //we are making watcher, so that if there is any real time data update then we can update it through this function
 User.watch().on("change", async ()=>{
   const stats = await Stats.find({}).sort({createdAt: "desc"}).limit(1);
