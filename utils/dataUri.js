@@ -23,7 +23,7 @@ export default getDataUri;
 
 
 export const generateCertificate = async (name, courseName, completionDate) => {
-  const filePath = path.resolve(__dirname, process.env.CERTIFICATES_TEMPLATE_PATH);
+  const filePath = path.resolve(__dirname, '../../nexustech/src/assets/certificates/Untitled.pdf');
   console.log('Resolved template filePath:', filePath); // Debugging
 
   const existingPdfBytes = fs.readFileSync(filePath);
