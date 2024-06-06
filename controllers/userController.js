@@ -9,6 +9,22 @@ import crypto from "crypto";
 import cloudinary from "cloudinary";
 import { Stats } from "../models/Stats.js";
 
+
+
+
+import fs from 'fs';
+import path from 'path';
+
+
+
+import { fileURLToPath } from 'url';
+
+// Convert the module URL to a file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+
 export const register = catchAsyncError(async(req, res, next)=>{
   const file = req.file;
     const {name, email, password} = req.body;
@@ -288,4 +304,38 @@ User.watch().on("change", async ()=>{
   stats[0].subscription = subscription.length;
   stats[0].createdAt = new Date(Date.now());
   await stats[0].save();
+});
+
+
+
+
+
+export const generateCourseCertificate = catchAsyncError(async (req, res, next) => {
+  const { userId, courseId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) return next(new ErrorHandler("User not found", 404));
+
+  const course = await Course.findById(courseId);
+  if (!course) return next(new ErrorHandler("Course not found", 404));
+
+  const completionDate = new Date().toLocaleDateString();
+  const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
+
+  // Ensure the abc directory exists (usually you ensure such things at setup or migration)
+  const abcDir = path.resolve(__dirname, '../../nexustech/src/assets/certificates');
+  if (!fs.existsSync(abcDir)) {
+    fs.mkdirSync(abcDir);
+  }
+
+  const filePath = path.resolve(abcDir, `${user.name}_${course.title}_certificate.pdf`);
+  fs.writeFileSync(filePath, pdfBytes);
+
+  res.status(200).json({
+    success: true,
+    message: "Certificate generated successfully",
+    data: {
+      url: `/controllers/abc/${user.name}_${course.title}_certificate.pdf`,
+    },
+  });
 });
