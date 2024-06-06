@@ -3,6 +3,7 @@ import {config} from "dotenv";
 import ErrorMiddleware from "./middlewares/Error.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import path from "path";
 config({path:"./config/config.env"});
 const app = express();
 
@@ -15,6 +16,13 @@ app.use(express.urlencoded({
     extended: true,
 }));
 app.use(cookieParser());
+
+
+// Convert the module URL to a file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/controllers/abc', express.static(path.join(__dirname, 'controllers/abc')));
+
 //importing and using routes
 import course from "./routes/courseRoutes.js";
 import tutorial from "./routes/tutorialRoutes.js";
