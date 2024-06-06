@@ -4,6 +4,8 @@ import ErrorMiddleware from "./middlewares/Error.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
+import { fileURLToPath } from 'url';
+
 config({path:"./config/config.env"});
 const app = express();
 
