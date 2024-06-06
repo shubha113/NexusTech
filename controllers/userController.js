@@ -11,7 +11,6 @@ import { Stats } from "../models/Stats.js";
 
 
 
-
 import fs from 'fs';
 import path from 'path';
 
@@ -22,8 +21,6 @@ import { fileURLToPath } from 'url';
 // Convert the module URL to a file path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-
 
 export const register = catchAsyncError(async(req, res, next)=>{
   const file = req.file;
@@ -71,7 +68,6 @@ export const logout = catchAsyncError(async (req, res, next) => {
     });
 });
 
-
 // Controller to get user profile data with progress calculations
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
   try {
@@ -104,6 +100,8 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
 });
 
 
+
+// controllers/userController.js
 export const updateLectureProgress = catchAsyncError(async (req, res, next) => {
   const { courseId, lectureNumber } = req.body;
 
@@ -298,8 +296,10 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
   const { userId, courseId } = req.params;
 
   const user = await User.findById(userId);
+  if (!user) return next(new ErrorHandler("User not found", 404));
 
   const course = await Course.findById(courseId);
+  if (!course) return next(new ErrorHandler("Course not found", 404));
 
   const completionDate = new Date().toLocaleDateString();
   const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
@@ -321,6 +321,7 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
     },
   });
 });
+
 
 
 //we are making watcher, so that if there is any real time data update then we can update it through this function
