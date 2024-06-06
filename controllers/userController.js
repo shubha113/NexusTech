@@ -307,7 +307,7 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
     const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
 
     // Use environment variable for the certificates directory
-    const certificatesDir = path.resolve(__dirname, process.env.CERTIFICATES_DIR || '../../nexustech/src/assets/certificates');
+    const certificatesDir = path.resolve(__dirname, process.env.CERTIFICATES_DIR);
     if (!fs.existsSync(certificatesDir)) {
       fs.mkdirSync(certificatesDir, { recursive: true });
     }
@@ -319,7 +319,7 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
       success: true,
       message: "Certificate generated successfully",
       data: {
-        url: `${process.env.CERTIFICATES_URL_BASE || '/controllers/abc'}/${user.name}_${course.title}_certificate.pdf`,
+        url: `${process.env.CERTIFICATES_URL_BASE}/${user.name}_${course.title}_certificate.pdf`,
       },
     });
   } catch (error) {
