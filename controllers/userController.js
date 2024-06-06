@@ -293,22 +293,6 @@ export const deleteMyProfile = catchAsyncError(async(req, res, next)=>{
   });
 });
 
-//to show the buyed course in pofile
-
-
-//we are making watcher, so that if there is any real time data update then we can update it through this function
-User.watch().on("change", async ()=>{
-  const stats = await Stats.find({}).sort({createdAt: "desc"}).limit(1);
-  const subscription = await User.find({"subscription.status":"created"});
-  stats[0].users = await User.countDocuments();
-  stats[0].subscription = subscription.length;
-  stats[0].createdAt = new Date(Date.now());
-  await stats[0].save();
-});
-
-
-
-
 
 export const generateCourseCertificate = catchAsyncError(async (req, res, next) => {
   const { userId, courseId } = req.params;
@@ -338,4 +322,15 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
       url: `/controllers/abc/${user.name}_${course.title}_certificate.pdf`,
     },
   });
+});
+
+
+//we are making watcher, so that if there is any real time data update then we can update it through this function
+User.watch().on("change", async ()=>{
+  const stats = await Stats.find({}).sort({createdAt: "desc"}).limit(1);
+  const subscription = await User.find({"subscription.status":"created"});
+  stats[0].users = await User.countDocuments();
+  stats[0].subscription = subscription.length;
+  stats[0].createdAt = new Date(Date.now());
+  await stats[0].save();
 });
