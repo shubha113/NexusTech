@@ -294,33 +294,38 @@ export const deleteMyProfile = catchAsyncError(async(req, res, next)=>{
 
 
 export const generateCourseCertificate = catchAsyncError(async (req, res, next) => {
-  const { userId, courseId } = req.params;
+  try {
+    const { userId, courseId } = req.params;
 
-  const user = await User.findById(userId);
-  if (!user) return next(new ErrorHandler("User not found", 404));
+    const user = await User.findById(userId);
+    if (!user) return next(new ErrorHandler("User not found", 404));
 
-  const course = await Course.findById(courseId);
-  if (!course) return next(new ErrorHandler("Course not found", 404));
+    const course = await Course.findById(courseId);
+    if (!course) return next(new ErrorHandler("Course not found", 404));
 
-  const completionDate = new Date().toLocaleDateString();
-  const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
+    const completionDate = new Date().toLocaleDateString();
+    const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
 
-  // Ensure the abc directory exists (usually you ensure such things at setup or migration)
-  const abcDir = path.resolve(__dirname, '../../nexustech/src/assets/certificates');
-  if (!fs.existsSync(abcDir)) {
-    fs.mkdirSync(abcDir);
+    // Use environment variable for the certificates directory
+    const certificatesDir = path.resolve(__dirname, process.env.CERTIFICATES_DIR || '../../nexustech/src/assets/certificates');
+    if (!fs.existsSync(certificatesDir)) {
+      fs.mkdirSync(certificatesDir, { recursive: true });
+    }
+
+    const filePath = path.resolve(certificatesDir, `${user.name}_${course.title}_certificate.pdf`);
+    fs.writeFileSync(filePath, pdfBytes);
+
+    res.status(200).json({
+      success: true,
+      message: "Certificate generated successfully",
+      data: {
+        url: `${process.env.CERTIFICATES_URL_BASE || '/controllers/abc'}/${user.name}_${course.title}_certificate.pdf`,
+      },
+    });
+  } catch (error) {
+    console.error('Error generating certificate:', error);
+    next(error);
   }
-
-  const filePath = path.resolve(abcDir, `${user.name}_${course.title}_certificate.pdf`);
-  fs.writeFileSync(filePath, pdfBytes);
-
-  res.status(200).json({
-    success: true,
-    message: "Certificate generated successfully",
-    data: {
-      url: `/controllers/abc/${user.name}_${course.title}_certificate.pdf`,
-    },
-  });
 });
 
 
