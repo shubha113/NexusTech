@@ -308,11 +308,14 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
 
     // Use environment variable for the certificates directory
     const certificatesDir = path.resolve(__dirname, process.env.CERTIFICATES_DIR);
+    console.log('Resolved certificatesDir in controller:', certificatesDir); // Debugging
+
     if (!fs.existsSync(certificatesDir)) {
       fs.mkdirSync(certificatesDir, { recursive: true });
     }
 
     const filePath = path.resolve(certificatesDir, `${user.name}_${course.title}_certificate.pdf`);
+    console.log('Generated filePath:', filePath); // Debugging
     fs.writeFileSync(filePath, pdfBytes);
 
     res.status(200).json({
@@ -327,6 +330,7 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
     next(error);
   }
 });
+
 
 
 //we are making watcher, so that if there is any real time data update then we can update it through this function
