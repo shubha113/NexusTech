@@ -11,6 +11,17 @@ import { Stats } from "../models/Stats.js";
 
 
 
+import fs from 'fs';
+import path from 'path';
+
+
+
+import { fileURLToPath } from 'url';
+
+// Convert the module URL to a file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export const register = catchAsyncError(async(req, res, next)=>{
   const file = req.file;
     const {name, email, password} = req.body;
