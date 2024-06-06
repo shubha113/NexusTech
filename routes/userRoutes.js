@@ -1,5 +1,5 @@
 import express from 'express';
-import { addToPlaylist, changePassword, deleteMyProfile, deleteUser, forgetPassword, getAllUsers, generateCourseCertificate, getMyProfile, login, logout, register, removeFromPlaylist, resetPassword, updateLectureProgress, updateProfile, updateProfilePicture, updateUserRole } from '../controllers/userController.js';
+import { addToPlaylist, changePassword, deleteMyProfile, deleteUser, forgetPassword, getAllUsers, getMyProfile, login, logout, register, removeFromPlaylist, resetPassword, updateLectureProgress, updateProfile, updateProfilePicture, updateUserRole } from '../controllers/userController.js';
 import {authorizeAdmin, isAuthenticated} from '../middlewares/auth.js';
 import singleUpload from '../middlewares/multer.js';
 
@@ -19,7 +19,6 @@ router.route('/me').delete(isAuthenticated, deleteMyProfile);
 //
 router.route('/me/updateProgress').post(isAuthenticated, updateLectureProgress);
 // Route to generate a certificate for a completed course
-router.route('/me/generate-certificate/:userId/:courseId').get ( isAuthenticated, generateCourseCertificate);
 //change password
 router.route('/changepassword').put(isAuthenticated, changePassword);
 //update profile
