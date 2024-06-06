@@ -296,10 +296,8 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
   const { userId, courseId } = req.params;
 
   const user = await User.findById(userId);
-  if (!user) return next(new ErrorHandler("User not found", 404));
 
   const course = await Course.findById(courseId);
-  if (!course) return next(new ErrorHandler("Course not found", 404));
 
   const completionDate = new Date().toLocaleDateString();
   const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
