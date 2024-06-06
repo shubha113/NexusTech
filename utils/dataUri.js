@@ -25,6 +25,9 @@ export default getDataUri;
 export const generateCertificate = async (name, courseName, completionDate) => {
   const filePath = process.env.CERTIFICATE_TEMPLATE_PATH;
   if (!fs.existsSync(filePath)) {
+  return next(new ErrorHandler(`File not found: ${filePath}`, 500));
+}
+  if (!fs.existsSync(filePath)) {
     throw new Error(`File not found: ${filePath}`);
   }
   const existingPdfBytes = fs.readFileSync(filePath);
