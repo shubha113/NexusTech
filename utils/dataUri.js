@@ -30,7 +30,7 @@ const hexToRgb = (hex) => {
   return rgb(r / 255, g / 255, b / 255);
 };
 
-export const generateCertificate = async (name, courseName, completionDate) => {
+export const generateCertificate = async (name, courseName) => {
   try {
     const fileUrl = 'https://res.cloudinary.com/dwjicc9at/image/upload/v1717785177/Untitled_1_iqcdwn.pdf';  // Use your actual Cloudinary URL
     const response = await fetch(fileUrl);
@@ -48,7 +48,7 @@ export const generateCertificate = async (name, courseName, completionDate) => {
     const nameX = 380; // X coordinate for name
     const nameY = 235; // Y coordinate for name
     const courseX = 241; // X coordinate for course name
-    const courseY = 152; // Y coordinate for course name
+    const courseY = 158; // Y coordinate for course name
     const dateX = 320; // X coordinate for date
     const dateY = 180; // Y coordinate for date
 
@@ -57,7 +57,6 @@ export const generateCertificate = async (name, courseName, completionDate) => {
 
     firstPage.drawText(name, { x: nameX, y: nameY, size: 40, font: boldFont, color: nameColor });
     firstPage.drawText(courseName, { x: courseX, y: courseY, size: 20, font: boldFont, color: courseColor });
-    firstPage.drawText(completionDate, { x: dateX, y: dateY, size: 20, font, color: rgb(0, 0, 0) });
 
     const pdfBytes = await pdfDoc.save();
     return pdfBytes;
