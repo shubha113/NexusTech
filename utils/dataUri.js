@@ -44,10 +44,10 @@ export const generateCertificate = async (name, courseName, completionDate) => {
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     // Replace these with the exact coordinates and color codes
-    const nameX = 360; // X coordinate for name
-    const nameY = 430; // Y coordinate for name
+    const nameX = 380; // X coordinate for name
+    const nameY = 230; // Y coordinate for name
     const courseX = 280; // X coordinate for course name
-    const courseY = 440; // Y coordinate for course name
+    const courseY = 140; // Y coordinate for course name
     const dateX = 320; // X coordinate for date
     const dateY = 180; // Y coordinate for date
 
