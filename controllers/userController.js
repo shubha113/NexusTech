@@ -294,41 +294,34 @@ export const deleteMyProfile = catchAsyncError(async(req, res, next)=>{
 
 
 export const generateCourseCertificate = catchAsyncError(async (req, res, next) => {
-  try {
-    const { userId, courseId } = req.params;
+  const { userId, courseId } = req.params;
 
-    const user = await User.findById(userId);
-    if (!user) return next(new ErrorHandler("User not found", 404));
+  const user = await User.findById(userId);
+  if (!user) return next(new ErrorHandler("User not found", 404));
 
-    const course = await Course.findById(courseId);
-    if (!course) return next(new ErrorHandler("Course not found", 404));
+  const course = await Course.findById(courseId);
+  if (!course) return next(new ErrorHandler("Course not found", 404));
 
-    const completionDate = new Date().toLocaleDateString();
-    const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
+  const completionDate = new Date().toLocaleDateString();
+  const pdfBytes = await generateCertificate(user.name, course.title, completionDate);
 
-    // Use environment variable for the certificates directory
-    const certificatesDir = path.resolve(__dirname, '../../nexustech/src/assets/certificates');
-    console.log('Resolved certificatesDir in controller:', certificatesDir); // Debugging
-
-    if (!fs.existsSync(certificatesDir)) {
-      fs.mkdirSync(certificatesDir, { recursive: true });
+  // Upload the generated PDF to Cloudinary
+  cloudinary.v2.uploader.upload_stream({ resource_type: 'raw' },
+    (error, result) => {
+      if (error) {
+        console.error('Error uploading certificate to Cloudinary:', error);
+        return next(new ErrorHandler('Failed to upload certificate to Cloudinary', 500));
+      }
+      
+      res.status(200).json({
+        success: true,
+        message: "Certificate generated and uploaded successfully",
+        data: {
+          url: result.secure_url, // Use the secure URL provided by Cloudinary
+        },
+      });
     }
-
-    const filePath = path.resolve(certificatesDir, `${user.name}_${course.title}_certificate.pdf`);
-    console.log('Generated filePath:', filePath); // Debugging
-    fs.writeFileSync(filePath, pdfBytes);
-
-    res.status(200).json({
-      success: true,
-      message: "Certificate generated successfully",
-      data: {
-        url: `${process.env.CERTIFICATES_URL_BASE}/${user.name}_${course.title}_certificate.pdf`,
-      },
-    });
-  } catch (error) {
-    console.error('Error generating certificate:', error);
-    next(error);
-  }
+  ).end(pdfBytes);
 });
 
 
