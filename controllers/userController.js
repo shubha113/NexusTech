@@ -8,14 +8,8 @@ import { sendToken } from "../utils/sendToken.js";
 import crypto from "crypto";
 import cloudinary from "cloudinary";
 import { Stats } from "../models/Stats.js";
-
-
-
 import fs from 'fs';
 import path from 'path';
-
-
-
 import { fileURLToPath } from 'url';
 
 // Convert the module URL to a file path
@@ -88,7 +82,6 @@ export const getMyProfile = catchAsyncError(async (req, res, next) => {
       }
     });
 
-    // Send the response with updated user profile
     res.status(200).json({
       success: true,
       user,
@@ -317,7 +310,7 @@ export const generateCourseCertificate = catchAsyncError(async (req, res, next) 
         success: true,
         message: "Certificate generated and uploaded successfully",
         data: {
-          url: result.secure_url, // Use the secure URL provided by Cloudinary
+          url: result.secure_url,
         },
       });
     }
