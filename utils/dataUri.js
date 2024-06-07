@@ -24,7 +24,7 @@ export default getDataUri;
 
 export const generateCertificate = async (name, courseName, completionDate) => {
   try {
-    const fileUrl = 'https://res.cloudinary.com/dwjicc9at/raw/upload/v1717743599/Untitled_pmwojg.pdf';  // Use your actual Cloudinary URL
+    const fileUrl = 'https://res.cloudinary.com/dwjicc9at/image/upload/v1717760473/Untitled_yg6i89.png';  // Use your actual Cloudinary URL
     const response = await fetch(fileUrl);
     if (!response.ok) throw new Error(`Error fetching PDF: ${response.statusText}`);
     const existingPdfBytes = await response.arrayBuffer();
