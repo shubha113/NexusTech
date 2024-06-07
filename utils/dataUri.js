@@ -55,7 +55,7 @@ export const generateCertificate = async (name, courseName, completionDate) => {
     const courseColor = hexToRgb('#0056A6'); // Replace with actual hex color code for the course
 
     firstPage.drawText(name, { x: nameX, y: nameY, size: 40, font, color: nameColor });
-    firstPage.drawText(courseName, { x: courseX, y: courseY, size: 20, boldfont, color: courseColor });
+    firstPage.drawText(courseName, { x: courseX, y: courseY, size: 20, font, color: courseColor });
     firstPage.drawText(completionDate, { x: dateX, y: dateY, size: 20, font, color: rgb(0, 0, 0) });
 
     const pdfBytes = await pdfDoc.save();
