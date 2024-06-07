@@ -32,7 +32,7 @@ const hexToRgb = (hex) => {
 
 export const generateCertificate = async (name, courseName, completionDate) => {
   try {
-    const fileUrl = 'https://res.cloudinary.com/dwjicc9at/image/upload/v1717761335/Untitled_bez4bg.pdf';  // Use your actual Cloudinary URL
+    const fileUrl = 'https://res.cloudinary.com/dwjicc9at/image/upload/v1717785177/Untitled_1_iqcdwn.pdf';  // Use your actual Cloudinary URL
     const response = await fetch(fileUrl);
     if (!response.ok) throw new Error(`Error fetching PDF: ${response.statusText}`);
     const existingPdfBytes = await response.arrayBuffer();
