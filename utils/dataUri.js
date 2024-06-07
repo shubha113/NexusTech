@@ -1,7 +1,7 @@
 import DataUriParser from "datauri/parser.js";
 import path from "path";
 
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
@@ -42,6 +42,7 @@ export const generateCertificate = async (name, courseName, completionDate) => {
     const firstPage = pages[0];
     const { height } = firstPage.getSize();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
     // Replace these with the exact coordinates and color codes
     const nameX = 380; // X coordinate for name
@@ -54,8 +55,8 @@ export const generateCertificate = async (name, courseName, completionDate) => {
     const nameColor = hexToRgb('#F15A29'); // Replace with actual hex color code for the name
     const courseColor = hexToRgb('#0056A6'); // Replace with actual hex color code for the course
 
-    firstPage.drawText(name, { x: nameX, y: nameY, size: 40, font, color: nameColor });
-    firstPage.drawText(courseName, { x: courseX, y: courseY, size: 20, font, color: courseColor });
+    firstPage.drawText(name, { x: nameX, y: nameY, size: 40, font: boldFont, color: nameColor });
+    firstPage.drawText(courseName, { x: courseX, y: courseY, size: 20, font: boldFont, color: courseColor });
     firstPage.drawText(completionDate, { x: dateX, y: dateY, size: 20, font, color: rgb(0, 0, 0) });
 
     const pdfBytes = await pdfDoc.save();
