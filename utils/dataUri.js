@@ -47,8 +47,8 @@ export const generateCertificate = async (name, courseName, completionDate) => {
     // Replace these with the exact coordinates and color codes
     const nameX = 380; // X coordinate for name
     const nameY = 235; // Y coordinate for name
-    const courseX = 245; // X coordinate for course name
-    const courseY = 155; // Y coordinate for course name
+    const courseX = 241; // X coordinate for course name
+    const courseY = 152; // Y coordinate for course name
     const dateX = 320; // X coordinate for date
     const dateY = 180; // Y coordinate for date
 
