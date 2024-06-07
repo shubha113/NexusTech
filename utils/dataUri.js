@@ -1,12 +1,10 @@
 import DataUriParser from "datauri/parser.js";
 import path from "path";
-
 import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
-// Convert the module URL to a file path
-const __filename = fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url); 
 const __dirname = path.dirname(__filename);
 
 const getDataUri = (file) => {
