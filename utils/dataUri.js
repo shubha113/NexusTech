@@ -44,17 +44,17 @@ export const generateCertificate = async (name, courseName, completionDate) => {
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     // Replace these with the exact coordinates and color codes
-    const nameX = 320; // X coordinate for name
-    const nameY = 330; // Y coordinate for name
-    const courseX = 270; // X coordinate for course name
-    const courseY = 240; // Y coordinate for course name
+    const nameX = 360; // X coordinate for name
+    const nameY = 430; // Y coordinate for name
+    const courseX = 280; // X coordinate for course name
+    const courseY = 440; // Y coordinate for course name
     const dateX = 320; // X coordinate for date
     const dateY = 180; // Y coordinate for date
 
     const nameColor = hexToRgb('#F15A29'); // Replace with actual hex color code for the name
     const courseColor = hexToRgb('#0056A6'); // Replace with actual hex color code for the course
 
-    firstPage.drawText(name, { x: nameX, y: nameY, size: 20, font, color: nameColor });
+    firstPage.drawText(name, { x: nameX, y: nameY, size: 40, font, color: nameColor });
     firstPage.drawText(courseName, { x: courseX, y: courseY, size: 20, font, color: courseColor });
     firstPage.drawText(completionDate, { x: dateX, y: dateY, size: 20, font, color: rgb(0, 0, 0) });
 
