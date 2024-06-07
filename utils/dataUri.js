@@ -22,6 +22,14 @@ const getDataUri = (file) => {
 export default getDataUri;
 
 
+const hexToRgb = (hex) => {
+  const bigint = parseInt(hex.slice(1), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return rgb(r / 255, g / 255, b / 255);
+};
+
 export const generateCertificate = async (name, courseName, completionDate) => {
   try {
     const fileUrl = 'https://res.cloudinary.com/dwjicc9at/image/upload/v1717761335/Untitled_bez4bg.pdf';  // Use your actual Cloudinary URL
@@ -35,9 +43,20 @@ export const generateCertificate = async (name, courseName, completionDate) => {
     const { height } = firstPage.getSize();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    firstPage.drawText(name, { x: 100, y: height - 200, size: 30, font, color: rgb(0, 0, 0) });
-    firstPage.drawText(courseName, { x: 100, y: height - 250, size: 20, font, color: rgb(0, 0, 0) });
-    firstPage.drawText(completionDate, { x: 100, y: height - 300, size: 20, font, color: rgb(0, 0, 0) });
+    // Replace these with the exact coordinates and color codes
+    const nameX = 320; // X coordinate for name
+    const nameY = 330; // Y coordinate for name
+    const courseX = 270; // X coordinate for course name
+    const courseY = 240; // Y coordinate for course name
+    const dateX = 320; // X coordinate for date
+    const dateY = 180; // Y coordinate for date
+
+    const nameColor = hexToRgb('#F15A29'); // Replace with actual hex color code for the name
+    const courseColor = hexToRgb('#0056A6'); // Replace with actual hex color code for the course
+
+    firstPage.drawText(name, { x: nameX, y: nameY, size: 20, font, color: nameColor });
+    firstPage.drawText(courseName, { x: courseX, y: courseY, size: 20, font, color: courseColor });
+    firstPage.drawText(completionDate, { x: dateX, y: dateY, size: 20, font, color: rgb(0, 0, 0) });
 
     const pdfBytes = await pdfDoc.save();
     return pdfBytes;
