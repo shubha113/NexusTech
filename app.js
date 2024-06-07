@@ -15,8 +15,13 @@ console.log('CERTIFICATES_TEMPLATE_PATH:', process.env.CERTIFICATES_TEMPLATE_PAT
 console.log('CERTIFICATES_URL_BASE:', process.env.CERTIFICATES_URL_BASE);
 
 // CORS configuration
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE'] }));
-
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  next();
+});
 // Using middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
