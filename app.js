@@ -9,11 +9,6 @@ import { fileURLToPath } from 'url';
 config({ path: './config/config.env' });
 const app = express();
 
-// Print environment variables for debugging
-console.log('CERTIFICATES_DIR:', process.env.CERTIFICATES_DIR);
-console.log('CERTIFICATES_TEMPLATE_PATH:', process.env.CERTIFICATES_TEMPLATE_PATH);
-console.log('CERTIFICATES_URL_BASE:', process.env.CERTIFICATES_URL_BASE);
-
 // CORS configuration
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
