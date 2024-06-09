@@ -37,12 +37,12 @@ export const login = catchAsyncError(async (req, res, next) => {
 
   const user = await User.findOne({ email }).select("+password");
 
-  if (!user) return next(new ErrorHandler("Incorrect Email or Password, BTW it's easy than your ex's phone no.", 401));
+  if (!user) return next(new ErrorHandler("Incorrect Email or Password, BTW it's easy than your ex's phone no.🤭", 401));
 
   const isMatch = await user.comparePassword(password);
 
   if (!isMatch)
-    return next(new ErrorHandler("Incorrect Email or Password, BTW it's easy than your ex's phone no.", 401));
+    return next(new ErrorHandler("Incorrect Email or Password, BTW it's easy than your ex's phone no.🤭", 401));
 
   sendToken(res, user, `Welcome back, ${user.name}`, 200);
 });
