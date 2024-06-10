@@ -11,8 +11,8 @@ router.route('/deletetutorial/:id').delete(isAuthenticated, authorizeAdmin, dele
 router.route('/tutorial').get(getTutorial);
 // Get single tutorial by ID
 router.route('/tutorial/:id').get(getSingleTutorial);
-// Route to get a update tutorial by ID
-router.route('/tutorial/:id').put(isAuthenticated, updateTutorial);
+// Route to get a update tutorial by ID -- admin
+router.route('/tutorial/:id').put(isAuthenticated, authorizeAdmin, updateTutorial);
 // Delete tutorial -- admin
 router.route('/tutorial/:id').delete(isAuthenticated, authorizeAdmin, deleteTutorial);
 
