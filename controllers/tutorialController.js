@@ -65,3 +65,29 @@ export const createTutorial = catchAsyncError(async (req, res, next) => {
       tutorial,
     });
   });
+
+export const updateTutorial = catchAsyncError(async (req, res, next) => {
+    const { id } = req.params;
+    const { title, content, category } = req.body;
+  
+    if (!title || !content || !category)
+      return next(new ErrorHandler("Please add all fields", 400));
+  
+    const tutorial = await Tutorial.findById(id);
+  
+    if (!tutorial) {
+      return next(new ErrorHandler("Tutorial not found", 404));
+    }
+  
+    tutorial.title = title;
+    tutorial.content = content;
+    tutorial.category = category;
+  
+    await tutorial.save();
+  
+    res.status(200).json({
+      success: true,
+      message: "Tutorial Updated Successfully",
+      tutorial
+    });
+});
