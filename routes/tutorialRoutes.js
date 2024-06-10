@@ -10,7 +10,7 @@ router.route('/deletetutorial/:id').delete(isAuthenticated, authorizeAdmin, dele
 //get tutorial -- admin 
 router.route('/tutorial').get(getTutorial);
 // Route to get a update tutorial by ID
-router.route('/tutorial/:id').put(isAuthenticated, updateTutorial) ;;
+router.route('/tutorial/:id').put(isAuthenticated, updateTutorial).delete(isAuthenticated, getSingleTutorial);
 
 
 export default router;
