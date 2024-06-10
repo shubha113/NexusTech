@@ -1,6 +1,6 @@
 import express from 'express';
 import { authorizeAdmin, isAuthenticated } from '../middlewares/auth.js';
-import { createTutorial, deleteTutorial, getSingleTutorial, getTutorial } from '../controllers/tutorialController.js';
+import { createTutorial, deleteTutorial, getSingleTutorial, getTutorial, updateTutorial } from '../controllers/tutorialController.js';
 const router = express.Router();
 
 //create new tutorial -- admin
@@ -9,8 +9,8 @@ router.route('/createtutorial').post(isAuthenticated, authorizeAdmin, createTuto
 router.route('/deletetutorial/:id').delete(isAuthenticated, authorizeAdmin, deleteTutorial);
 //get tutorial -- admin 
 router.route('/tutorial').get(getTutorial);
-// Route to get a single tutorial by ID
-router.route('/singletutorial/:id').get(isAuthenticated, authorizeAdmin, getSingleTutorial);
+// Route to get a update tutorial by ID
+router.route('/tutorial/:id').put(isAuthenticated, updateTutorial) ;;
 
 
 export default router;
